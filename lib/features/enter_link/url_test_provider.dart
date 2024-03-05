@@ -1,10 +1,15 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-sealed class UrlTestState {}
+sealed class UrlTestState {
+  const UrlTestState();
+}
 
 class UrlTestAwaiting extends UrlTestState {}
 
-class UrlTestSuccess extends UrlTestState {}
+class UrlTestSuccess extends UrlTestState {
+  const UrlTestSuccess(this.url);
+  final Uri url;
+}
 
 class UrlTestError extends UrlTestState {
   UrlTestError(this.message);
@@ -18,8 +23,8 @@ class UrlTestNotifier extends Notifier<UrlTestState> {
   }
 
   Future<void> testUrl(String url) async {
-    if (Uri.tryParse(url)?.host.isNotEmpty ?? false) {
-      state = UrlTestSuccess();
+    if (Uri.tryParse(url) case final url? when url.host.isNotEmpty) {
+      state = UrlTestSuccess(url);
     } else {
       state = UrlTestError('Invalid URL. Please try again');
     }

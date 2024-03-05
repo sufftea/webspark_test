@@ -1,4 +1,7 @@
+import 'package:flex_color_scheme/flex_color_scheme.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:webspark_test/features/navigation/router.dart';
 
 void main() {
   runApp(const MainApp());
@@ -9,11 +12,12 @@ class MainApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const MaterialApp(
-      home: Scaffold(
-        body: Center(
-          child: Text('Hello World!'),
-        ),
+    return ProviderScope(
+      child: MaterialApp.router(
+        theme: FlexColorScheme.light(
+          scheme: FlexScheme.deepPurple,
+        ).toTheme,
+        routerConfig: router,
       ),
     );
   }

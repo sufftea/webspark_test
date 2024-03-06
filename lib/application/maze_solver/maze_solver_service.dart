@@ -26,15 +26,16 @@ class MazeSolverService extends Notifier<MazeSolverState?> {
       throw StateError('sendResults called without providing baseURL');
     }
 
-    if (state case final MazeSolverProgressState state when state.isComplete) {
+    final state = this.state;
+    if (state is MazeSolverSolvingState && state.isComplete) {
       try {
-        this.state = MazeSolverSendingState(state);
+        this.state = state.copyWith(state: SolvingState.sendingResult);
 
         await ref
             .watch(mazeRepositoryProvider(baseUrl))
             .sendResult(state.solutions);
 
-        this.state = MazeSolverSuccessState(state);
+        this.state = state.copyWith(state: SolvingState.success);
       } on MazeRepositoryException catch (e) {
         this.state = MazeSolverErrorState(e.message);
       }
@@ -46,14 +47,14 @@ class MazeSolverService extends Notifier<MazeSolverState?> {
   void _startSolving(String baseUrl) async {
     final mazes = await ref.watch(mazeRepositoryProvider(baseUrl)).fetchMazes();
 
-    state = MazeSolverProgressState(allMazes: mazes);
+    state = MazeSolverSolvingState(allMazes: mazes);
 
     final pathfinder = ref.read(pathfinderRepositoryProvider);
 
     for (final maze in mazes) {
       final solution = await pathfinder.solveMaze(maze);
 
-      if (state case final MazeSolverProgressState state) {
+      if (state case final MazeSolverSolvingState state) {
         this.state = state.copyWith(solutions: [...state.solutions, solution]);
       }
     }

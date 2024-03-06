@@ -34,6 +34,10 @@ class MainApp extends StatelessWidget {
     ).toTheme.copyWith(
           elevatedButtonTheme: const ElevatedButtonThemeData(
             style: ButtonStyle(
+              textStyle: MaterialStatePropertyAll(TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+              )),
               padding: MaterialStatePropertyAll(EdgeInsets.all(24)),
             ),
           ),

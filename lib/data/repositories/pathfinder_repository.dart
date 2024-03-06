@@ -10,9 +10,6 @@ class PathfinderRepository {
     return compute(
       (maze) {
         final path = AStar(maze).findPath();
-        debugPrint('start: ${maze.start}, end: ${maze.end}');
-        debugPrint('solved path: ${maze.field}');
-        debugPrint('solution: $path');
         return MazeSolution(path: path, maze: maze);
       },
       maze,

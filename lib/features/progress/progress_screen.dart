@@ -1,12 +1,9 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:webspark_test/application/maze_solver/maze_solver_service.dart';
 import 'package:webspark_test/application/maze_solver/maze_solver_state.dart';
-import 'package:webspark_test/data/repositories/base_url_repository.dart';
-import 'package:webspark_test/data/repositories/maze_repository.dart';
+import 'package:webspark_test/features/results/results_screen.dart';
 
 class ProgressScreen extends StatelessWidget {
   const ProgressScreen({super.key});
@@ -28,7 +25,7 @@ class ProgressScreen extends StatelessWidget {
               builder: (context, ref, child) {
                 return switch (ref.watch(mazeSolverServiceProvider)) {
                   MazeSolverFetchingState() => const Text('Fetching mazes'),
-                  MazeSolverProgressState(
+                  MazeSolverSolvingState(
                     solutions: final solutions,
                     allMazes: final allMases,
                   ) =>
@@ -42,58 +39,67 @@ class ProgressScreen extends StatelessWidget {
             ),
             const Spacer(),
             Consumer(builder: (context, ref, child) {
-              final baseUrl = ref.watch(baseUrlRepositoryProvider);
-
               ref.listen(
                 mazeSolverServiceProvider,
                 (previous, next) {
-                  if (previous is! MazeSolverSuccessState &&
-                      next is MazeSolverSuccessState) {
-                    debugPrint('navigating to results screen');
-                    // context.pushNamed(name);
+                  if (next is MazeSolverSolvingState &&
+                      next.state == SolvingState.success) {
+                    context.pushNamed(ResultsScreen.routeName);
                   }
                 },
               );
 
               return switch (ref.watch(mazeSolverServiceProvider)) {
-                final MazeSolverProgressState progress
+                final MazeSolverSolvingState progress
                     when progress.isComplete =>
-                  ElevatedButton(
-                    onPressed: () {
-                      ref
-                          .watch(mazeSolverServiceProvider.notifier)
-                          .sendResults();
-                    },
-                    child: const Text('Send results to server'),
-                  ),
-                MazeSolverSendingState() => const ElevatedButton(
-                    onPressed: null,
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        SizedBox(
-                          height: 24,
-                          child: AspectRatio(
-                            aspectRatio: 1,
-                            child: CircularProgressIndicator(),
-                          ),
-                        ),
-                        SizedBox(width: 8),
-                        Text('Send results to server'),
-                      ],
-                    ),
-                  ),
-                MazeSolverErrorState() => const ElevatedButton(
-                    onPressed: null,
-                    child: Text('Send results to server'),
-                  ),
-                _ => const SizedBox.shrink(),
+                  switch (progress.state) {
+                    SolvingState.pathfinding => buildReadyButton(ref),
+                    SolvingState.sendingResult => buildLoadingButton(),
+                    SolvingState.success => buildReadyButton(ref),
+                  },
+                _ => buildDisabledButton(),
               };
             }),
           ],
         ),
       ),
+    );
+  }
+
+  ElevatedButton buildDisabledButton() {
+    return const ElevatedButton(
+      onPressed: null,
+      child: Text('Send results to server'),
+    );
+  }
+
+  ElevatedButton buildLoadingButton() {
+    return const ElevatedButton(
+      onPressed: null,
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          SizedBox(
+            height: 24,
+            child: AspectRatio(
+              aspectRatio: 1,
+              child: CircularProgressIndicator(),
+            ),
+          ),
+          SizedBox(width: 8),
+          Text('Send results to server'),
+        ],
+      ),
+    );
+  }
+
+  ElevatedButton buildReadyButton(WidgetRef ref) {
+    return ElevatedButton(
+      onPressed: () {
+        ref.watch(mazeSolverServiceProvider.notifier).sendResults();
+      },
+      child: const Text('Send results to server'),
     );
   }
 }

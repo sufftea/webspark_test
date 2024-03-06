@@ -9,42 +9,40 @@ class MazeSolverFetchingState extends MazeSolverState {
   const MazeSolverFetchingState();
 }
 
-class MazeSolverProgressState extends MazeSolverState {
-  const MazeSolverProgressState({
+class MazeSolverSolvingState extends MazeSolverState {
+  const MazeSolverSolvingState({
     this.allMazes = const [],
     this.solutions = const [],
+    this.state = SolvingState.pathfinding,
   });
 
   final List<Maze> allMazes;
   final List<MazeSolution> solutions;
+  final SolvingState state;
 
   bool get isComplete => allMazes.length == solutions.length;
 
-  MazeSolverProgressState copyWith({
+  MazeSolverSolvingState copyWith({
     List<Maze>? allMazes,
     List<MazeSolution>? solutions,
+    SolvingState? state,
   }) {
-    return MazeSolverProgressState(
+    return MazeSolverSolvingState(
       allMazes: allMazes ?? this.allMazes,
       solutions: solutions ?? this.solutions,
+      state: state ?? this.state,
     );
   }
-}
-
-class MazeSolverSendingState extends MazeSolverState {
-  MazeSolverSendingState(this.progressState);
-
-  final MazeSolverProgressState progressState;
-}
-
-class MazeSolverSuccessState extends MazeSolverState {
-  MazeSolverSuccessState(this.progressState);
-
-  final MazeSolverProgressState progressState;
 }
 
 class MazeSolverErrorState extends MazeSolverState {
   const MazeSolverErrorState(this.message);
 
   final String message;
+}
+
+enum SolvingState {
+  pathfinding,
+  sendingResult,
+  success,
 }

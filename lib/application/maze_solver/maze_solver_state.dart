@@ -5,8 +5,8 @@ sealed class MazeSolverState {
   const MazeSolverState();
 }
 
-class FetchingMazesState extends MazeSolverState {
-  const FetchingMazesState();
+class MazeSolverFetchingState extends MazeSolverState {
+  const MazeSolverFetchingState();
 }
 
 class MazeSolverProgressState extends MazeSolverState {
@@ -18,6 +18,8 @@ class MazeSolverProgressState extends MazeSolverState {
   final List<Maze> allMazes;
   final List<MazeSolution> solutions;
 
+  bool get isComplete => allMazes.length == solutions.length;
+
   MazeSolverProgressState copyWith({
     List<Maze>? allMazes,
     List<MazeSolution>? solutions,
@@ -27,4 +29,22 @@ class MazeSolverProgressState extends MazeSolverState {
       solutions: solutions ?? this.solutions,
     );
   }
+}
+
+class MazeSolverSendingState extends MazeSolverState {
+  MazeSolverSendingState(this.progressState);
+
+  final MazeSolverProgressState progressState;
+}
+
+class MazeSolverSuccessState extends MazeSolverState {
+  MazeSolverSuccessState(this.progressState);
+
+  final MazeSolverProgressState progressState;
+}
+
+class MazeSolverErrorState extends MazeSolverState {
+  const MazeSolverErrorState(this.message);
+
+  final String message;
 }

@@ -53,7 +53,7 @@ class AStar {
     );
   }
 
-  List<Point> findPath() {
+  List<Point<int>> findPath() {
     final startNode = PathNode(
       position: maze.start,
       fCost: heuristic(maze.start, maze.end),
@@ -100,7 +100,7 @@ class AStar {
     }
     final last = closed[maze.end.hashCode]!;
 
-    final result = <Point>[];
+    final result = <Point<int>>[];
     PathNode? curr = last;
     while (curr != null) {
       result.add(curr.position);

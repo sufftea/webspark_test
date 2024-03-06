@@ -8,6 +8,19 @@ class MazeSolution {
     required this.maze,
   });
 
-  final List<Point> path;
+  final List<Point<int>> path;
   final Maze maze;
+
+  String get pathString => path.fold(
+        '',
+        (previousValue, p) {
+          final pointString = '(${p.x},${p.y})';
+
+          if (previousValue.isNotEmpty) {
+            return '$previousValue->$pointString';
+          }
+          
+          return pointString;
+        },
+      );
 }

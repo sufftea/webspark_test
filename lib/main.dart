@@ -19,14 +19,24 @@ class MainApp extends StatelessWidget {
           ref.watch(mazeSolverServiceProvider);
 
           return child!;
-        },
+        },  
         child: MaterialApp.router(
-          theme: FlexColorScheme.light(
-            scheme: FlexScheme.deepPurple,
-          ).toTheme,
+          theme: createTheme(),
           routerConfig: router,
         ),
       ),
     );
+  }
+
+  ThemeData createTheme() {
+    return FlexColorScheme.light(
+      scheme: FlexScheme.deepPurple,
+    ).toTheme.copyWith(
+          elevatedButtonTheme: const ElevatedButtonThemeData(
+            style: ButtonStyle(
+              padding: MaterialStatePropertyAll(EdgeInsets.all(24)),
+            ),
+          ),
+        );
   }
 }

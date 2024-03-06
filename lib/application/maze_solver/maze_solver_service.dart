@@ -16,11 +16,35 @@ class MazeSolverService extends Notifier<MazeSolverState?> {
 
     _startSolving(baseUrl);
 
-    return const FetchingMazesState();
+    return const MazeSolverFetchingState();
+  }
+
+  Future<void> sendResults() async {
+    final baseUrl = ref.watch(baseUrlRepositoryProvider);
+
+    if (baseUrl == null) {
+      throw StateError('sendResults called without providing baseURL');
+    }
+
+    if (state case final MazeSolverProgressState state when state.isComplete) {
+      try {
+        this.state = MazeSolverSendingState(state);
+
+        await ref
+            .watch(mazeRepositoryProvider(baseUrl))
+            .sendResult(state.solutions);
+
+        this.state = MazeSolverSuccessState(state);
+      } on MazeRepositoryException catch (e) {
+        this.state = MazeSolverErrorState(e.message);
+      }
+    } else {
+      throw StateError('sendResults called before the computation finished');
+    }
   }
 
   void _startSolving(String baseUrl) async {
-    final mazes = await ref.watch(mazeRepositoryProvider).fetchMazes(baseUrl);
+    final mazes = await ref.watch(mazeRepositoryProvider(baseUrl)).fetchMazes();
 
     state = MazeSolverProgressState(allMazes: mazes);
 

@@ -1,11 +1,16 @@
+import 'dart:convert';
+
 import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:webspark_test/data/entities/maze.dart';
+import 'package:webspark_test/data/entities/solved_maze.dart';
 
 class MazeRepository {
-  const MazeRepository();
+  const MazeRepository(this.baseUrl);
 
-  Future<List<Maze>> fetchMazes(String baseUrl) async {
+  final String baseUrl;
+
+  Future<List<Maze>> fetchMazes() async {
     final response = await Dio().get(baseUrl);
 
     if (response.data
@@ -29,6 +34,51 @@ class MazeRepository {
       throw Exception("Couldn't parse response: $response");
     }
   }
+
+  Future<void> sendResult(List<MazeSolution> solutions) async {
+    final data = jsonEncode([
+      for (final solution in solutions)
+        {
+          'id': solution.maze.id,
+          'result': {
+            'steps': [
+              for (final point in solution.path)
+                {
+                  'x': point.x,
+                  'y': point.y,
+                }
+            ],
+            'path': solution.pathString,
+          },
+        },
+    ]);
+
+
+    final response = await Dio().post(baseUrl, data: data);
+
+    if (response.data
+        case {
+          'error': final error,
+          'message': final message,
+        }) {
+      if (error) {
+        throw MazeRepositoryException(message);
+      }
+    }
+  }
 }
 
-final mazeRepositoryProvider = Provider((ref) => const MazeRepository());
+final mazeRepositoryProvider = Provider.family<MazeRepository, String>(
+  (ref, baseUrl) => MazeRepository(baseUrl),
+);
+
+class MazeRepositoryException implements Exception {
+  MazeRepositoryException(this.message);
+
+  final String message;
+
+  @override
+  String toString() {
+    return message;
+  }
+}

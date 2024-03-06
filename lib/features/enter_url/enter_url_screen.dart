@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:webspark_test/features/enter_url/url_test_controller.dart';
 import 'package:webspark_test/features/enter_url/url_test_state.dart';
-import 'package:webspark_test/features/process/progress_screen.dart';
+import 'package:webspark_test/features/progress/progress_screen.dart';
 
 class EnterLinkScreen extends ConsumerStatefulWidget {
   const EnterLinkScreen({super.key});

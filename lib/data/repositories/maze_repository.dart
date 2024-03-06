@@ -53,17 +53,25 @@ class MazeRepository {
         },
     ]);
 
-
-    final response = await Dio().post(baseUrl, data: data);
-
-    if (response.data
-        case {
-          'error': final error,
-          'message': final message,
-        }) {
-      if (error) {
-        throw MazeRepositoryException(message);
+    try {
+      final response = await Dio().post(baseUrl, data: data);
+      if (response.data
+          case {
+            'error': final error,
+            'message': final message,
+          }) {
+        if (error) {
+          throw MazeRepositoryException(message);
+        }
+      } else {
+        throw MazeRepositoryException(
+          'Unexpected response from the server',
+        );
       }
+    } on DioException catch (e) {
+      throw MazeRepositoryException(
+        'Error occured when sending requests to server: ${e.message}',
+      );
     }
   }
 }

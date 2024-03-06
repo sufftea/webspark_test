@@ -1,16 +1,12 @@
 import 'package:dio/dio.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:webspark_test/data/entities/maze.dart';
 
 class MazeRepository {
-  MazeRepository(String baseUrl)
-      : _dio = Dio(BaseOptions(
-          baseUrl: baseUrl,
-        ));
+  const MazeRepository();
 
-  final Dio _dio;
-
-  Future<List<Maze>> fetchMazes() async {
-    final response = await _dio.get('/flutter/api');
+  Future<List<Maze>> fetchMazes(String baseUrl) async {
+    final response = await Dio().get(baseUrl);
 
     if (response.data
         case {
@@ -34,3 +30,5 @@ class MazeRepository {
     }
   }
 }
+
+final mazeRepositoryProvider = Provider((ref) => const MazeRepository());

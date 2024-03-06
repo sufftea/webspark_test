@@ -1,4 +1,3 @@
-import 'dart:html';
 import 'dart:math';
 
 class Maze {
@@ -10,7 +9,7 @@ class Maze {
   });
 
   final String id;
-  final String field;
+  final List<String> field;
   final Point start;
   final Point end;
 
@@ -18,7 +17,7 @@ class Maze {
     if (json
         case {
           'id': String id,
-          'field': String field,
+          'field': List<dynamic> field,
           'start': {
             'x': int startX,
             'y': int startY,
@@ -30,7 +29,7 @@ class Maze {
         }) {
       return Maze(
         id: id,
-        field: field,
+        field: field.cast<String>(),
         start: Point(startX, startY),
         end: Point(endX, endY),
       );

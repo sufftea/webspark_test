@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:webspark_test/features/enter_link/url_test_provider.dart';
+import 'package:go_router/go_router.dart';
+import 'package:webspark_test/features/enter_url/url_test_controller.dart';
+import 'package:webspark_test/features/enter_url/url_test_state.dart';
+import 'package:webspark_test/features/process/progress_screen.dart';
 
 class EnterLinkScreen extends ConsumerStatefulWidget {
   const EnterLinkScreen({super.key});
@@ -17,12 +20,11 @@ class _EnterLinkScreenState extends ConsumerState<EnterLinkScreen> {
   @override
   Widget build(BuildContext context) {
     ref.listen(
-      urlTestProvider,
+      urlTestControllerProvider,
       (previous, next) {
         switch (next) {
           case UrlTestSuccess():
-            debugPrint('success');
-          // conetxt.goNamed(name)
+            context.goNamed(ProgressScreen.routeName);
           default:
         }
       },
@@ -44,7 +46,7 @@ class _EnterLinkScreenState extends ConsumerState<EnterLinkScreen> {
             ),
             const SizedBox(height: 16),
             Consumer(builder: (context, ref, child) {
-              return switch (ref.watch(urlTestProvider)) {
+              return switch (ref.watch(urlTestControllerProvider)) {
                 final UrlTestError e => Text(e.message),
                 _ => const SizedBox.shrink(),
               };
@@ -52,7 +54,9 @@ class _EnterLinkScreenState extends ConsumerState<EnterLinkScreen> {
             const SizedBox(height: 16),
             ElevatedButton(
               onPressed: () {
-                ref.read(urlTestProvider.notifier).testUrl(textController.text);
+                ref
+                    .read(urlTestControllerProvider.notifier)
+                    .testUrl(textController.text);
               },
               child: const Text('Start'),
             ),

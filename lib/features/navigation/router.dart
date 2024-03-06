@@ -1,5 +1,6 @@
 import 'package:go_router/go_router.dart';
-import 'package:webspark_test/features/enter_link/enter_url_screen.dart';
+import 'package:webspark_test/features/enter_url/enter_url_screen.dart';
+import 'package:webspark_test/features/process/progress_screen.dart';
 
 final router = GoRouter(
   routes: [
@@ -7,6 +8,13 @@ final router = GoRouter(
       path: '/',
       name: EnterLinkScreen.routeName,
       builder: (context, state) => const EnterLinkScreen(),
+      routes: [
+        GoRoute(
+          path: 'solving',
+          name: ProgressScreen.routeName,
+          builder: (context, state) => const ProgressScreen(),
+        ),
+      ],
     ),
   ],
 );

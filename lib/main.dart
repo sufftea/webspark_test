@@ -1,6 +1,7 @@
 import 'package:flex_color_scheme/flex_color_scheme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:webspark_test/application/maze_solver/maze_solver_service.dart';
 import 'package:webspark_test/features/navigation/router.dart';
 
 void main() {
@@ -13,11 +14,18 @@ class MainApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ProviderScope(
-      child: MaterialApp.router(
-        theme: FlexColorScheme.light(
-          scheme: FlexScheme.deepPurple,
-        ).toTheme,
-        routerConfig: router,
+      child: Consumer(
+        builder: (context, ref, child) {
+          ref.watch(mazeSolverServiceProvider);
+
+          return child!;
+        },
+        child: MaterialApp.router(
+          theme: FlexColorScheme.light(
+            scheme: FlexScheme.deepPurple,
+          ).toTheme,
+          routerConfig: router,
+        ),
       ),
     );
   }

@@ -10,8 +10,8 @@ class Maze {
 
   final String id;
   final List<String> field;
-  final Point start;
-  final Point end;
+  final Point<int> start;
+  final Point<int> end;
 
   factory Maze.fromJson(dynamic json) {
     if (json

@@ -8,14 +8,6 @@ import 'package:webspark_test/data/repositories/pathfinder_repository.dart';
 class MazeSolverService extends Notifier<MazeSolverState?> {
   @override
   MazeSolverState? build() {
-    final baseUrl = ref.watch(baseUrlRepositoryProvider);
-
-    if (baseUrl == null) {
-      return null;
-    }
-
-    _startSolving(baseUrl);
-
     return const MazeSolverFetchingState();
   }
 
@@ -44,7 +36,13 @@ class MazeSolverService extends Notifier<MazeSolverState?> {
     }
   }
 
-  void _startSolving(String baseUrl) async {
+  void startSolving() async {
+    final baseUrl = ref.watch(baseUrlRepositoryProvider);
+
+    if (baseUrl == null) {
+      return;
+    }
+
     final mazes = await ref.watch(mazeRepositoryProvider(baseUrl)).fetchMazes();
 
     state = MazeSolverSolvingState(allMazes: mazes);

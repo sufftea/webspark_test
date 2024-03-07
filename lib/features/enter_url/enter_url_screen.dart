@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:webspark_test/application/maze_solver/maze_solver_service.dart';
 import 'package:webspark_test/features/enter_url/url_test_controller.dart';
 import 'package:webspark_test/features/enter_url/url_test_state.dart';
 import 'package:webspark_test/features/progress/progress_screen.dart';
@@ -24,6 +25,7 @@ class _EnterLinkScreenState extends ConsumerState<EnterLinkScreen> {
       (previous, next) {
         switch (next) {
           case UrlTestSuccess():
+            ref.watch(mazeSolverServiceProvider.notifier).startSolving();
             context.goNamed(ProgressScreen.routeName);
           default:
         }

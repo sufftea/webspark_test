@@ -11,27 +11,31 @@ class MazeRepository {
   final String baseUrl;
 
   Future<List<Maze>> fetchMazes() async {
-    final response = await Dio().get(baseUrl);
+    try {
+      final response = await Dio().get(baseUrl);
 
-    if (response.data
-        case {
-          'error': bool error,
-          'message': String message,
-          'data': final data,
-        }) {
-      if (error) {
-        throw Exception(message);
+      if (response.data
+          case {
+            'error': bool error,
+            'message': String message,
+            'data': final data,
+          }) {
+        if (error) {
+          throw MazeRepositoryException(message);
+        }
+
+        if (data is! List) {
+          throw MazeRepositoryException("Couldn't parse response: $data");
+        }
+
+        return [
+          for (final maze in data) Maze.fromJson(maze),
+        ];
+      } else {
+        throw MazeRepositoryException("Couldn't parse response: $response");
       }
-
-      if (data is! List) {
-        throw Exception("Couldn't parse response: $data");
-      }
-
-      return [
-        for (final maze in data) Maze.fromJson(maze),
-      ];
-    } else {
-      throw Exception("Couldn't parse response: $response");
+    } on DioException catch (e) {
+      throw MazeRepositoryException("Couldn't fetch mazes: ${e.message}");
     }
   }
 

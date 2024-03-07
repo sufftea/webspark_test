@@ -61,12 +61,13 @@ class AStar {
 
     while (true) {
       final curr = open.values.fold<PathNode?>(
-        null,
-        (previousValue, element) =>
-            (previousValue?.fCost ?? double.maxFinite) > element.fCost
-                ? element
-                : previousValue,
-      )!;
+            null,
+            (previousValue, element) =>
+                (previousValue?.fCost ?? double.maxFinite) > element.fCost
+                    ? element
+                    : previousValue,
+          ) ??
+          (throw Exception('Incorrect maze configuration'));
       open.remove(curr.hashCode);
       closed[curr.hashCode] = curr;
 

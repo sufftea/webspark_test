@@ -28,8 +28,8 @@ class MazeSolverService extends Notifier<MazeSolverState?> {
             .sendResult(state.solutions);
 
         this.state = state.copyWith(state: SolvingState.success);
-      } on MazeRepositoryException catch (e) {
-        this.state = MazeSolverErrorState(e.message);
+      } on Exception catch (e) {
+        this.state = MazeSolverErrorState(e.toString());
       }
     } else {
       throw StateError('sendResults called before the computation finished');
@@ -43,18 +43,24 @@ class MazeSolverService extends Notifier<MazeSolverState?> {
       return;
     }
 
-    final mazes = await ref.watch(mazeRepositoryProvider(baseUrl)).fetchMazes();
+    try {
+      final mazes =
+          await ref.watch(mazeRepositoryProvider(baseUrl)).fetchMazes();
 
-    state = MazeSolverSolvingState(allMazes: mazes);
+      state = MazeSolverSolvingState(allMazes: mazes);
 
-    final pathfinder = ref.read(pathfinderRepositoryProvider);
+      final pathfinder = ref.read(pathfinderRepositoryProvider);
 
-    for (final maze in mazes) {
-      final solution = await pathfinder.solveMaze(maze);
+      for (final maze in mazes) {
+        final solution = await pathfinder.solveMaze(maze);
 
-      if (state case final MazeSolverSolvingState state) {
-        this.state = state.copyWith(solutions: [...state.solutions, solution]);
+        if (state case final MazeSolverSolvingState state) {
+          this.state =
+              state.copyWith(solutions: [...state.solutions, solution]);
+        }
       }
+    } on Exception catch (e) {
+      state = MazeSolverErrorState(e.toString());
     }
   }
 }

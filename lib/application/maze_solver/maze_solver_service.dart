@@ -36,7 +36,7 @@ class MazeSolverService extends Notifier<MazeSolverState?> {
     }
   }
 
-  void startSolving() async {
+  Future<void> startSolving() async {
     final baseUrl = ref.watch(baseUrlRepositoryProvider);
 
     if (baseUrl == null) {

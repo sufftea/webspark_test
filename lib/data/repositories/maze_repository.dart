@@ -21,21 +21,21 @@ class MazeRepository {
             'data': final data,
           }) {
         if (error) {
-          throw MazeRepositoryException(message);
+          throw Exception(message);
         }
 
         if (data is! List) {
-          throw MazeRepositoryException("Couldn't parse response: $data");
+          throw Exception("Couldn't parse response: $data");
         }
 
         return [
           for (final maze in data) Maze.fromJson(maze),
         ];
       } else {
-        throw MazeRepositoryException("Couldn't parse response: $response");
+        throw Exception("Couldn't parse response: $response");
       }
     } on DioException catch (e) {
-      throw MazeRepositoryException("Couldn't fetch mazes: ${e.message}");
+      throw Exception("Couldn't fetch mazes: ${e.message}");
     }
   }
 
@@ -65,15 +65,15 @@ class MazeRepository {
             'message': final message,
           }) {
         if (error) {
-          throw MazeRepositoryException(message);
+          throw Exception(message);
         }
       } else {
-        throw MazeRepositoryException(
+        throw Exception(
           'Unexpected response from the server',
         );
       }
     } on DioException catch (e) {
-      throw MazeRepositoryException(
+      throw Exception(
         'Error occured when sending requests to server: ${e.message}',
       );
     }
@@ -83,14 +83,3 @@ class MazeRepository {
 final mazeRepositoryProvider = Provider.family<MazeRepository, String>(
   (ref, baseUrl) => MazeRepository(baseUrl),
 );
-
-class MazeRepositoryException implements Exception {
-  MazeRepositoryException(this.message);
-
-  final String message;
-
-  @override
-  String toString() {
-    return message;
-  }
-}

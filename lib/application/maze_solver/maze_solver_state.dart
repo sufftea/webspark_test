@@ -46,3 +46,4 @@ enum SolvingState {
   sendingResult,
   success,
 }
+

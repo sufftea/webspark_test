@@ -53,10 +53,11 @@ class ProgressScreen extends StatelessWidget {
                 final MazeSolverSolvingState progress
                     when progress.isComplete =>
                   switch (progress.state) {
-                    SolvingState.pathfinding => buildReadyButton(ref),
+                    SolvingState.pathfinding => buildReadyButton(),
                     SolvingState.sendingResult => buildLoadingButton(),
-                    SolvingState.success => buildReadyButton(ref),
+                    SolvingState.success => buildReadyButton(),
                   },
+                MazeSolverErrorState() => buildRetryButton(),
                 _ => buildDisabledButton(),
               };
             }),
@@ -94,12 +95,27 @@ class ProgressScreen extends StatelessWidget {
     );
   }
 
-  ElevatedButton buildReadyButton(WidgetRef ref) {
-    return ElevatedButton(
-      onPressed: () {
-        ref.watch(mazeSolverServiceProvider.notifier).sendResults();
-      },
-      child: const Text('Send results to server'),
-    );
+  Widget buildReadyButton() {
+    return Consumer(builder: (context, ref, child) {
+      return ElevatedButton(
+        onPressed: () {
+          ref.watch(mazeSolverServiceProvider.notifier).sendResults();
+        },
+        child: const Text('Send results to server'),
+      );
+    });
+  }
+
+  Widget buildRetryButton() {
+    return Consumer(builder: (context, ref, child) {
+      return ElevatedButton(
+        onPressed: () async {
+          final service = ref.watch(mazeSolverServiceProvider.notifier);
+          await service.startSolving();
+          await service.sendResults();
+        },
+        child: const Text('Retry'),
+      );
+    });
   }
 }
